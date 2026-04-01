@@ -8,7 +8,7 @@ const VERSION = process.env.APP_VERSION || '1.0.0';
 const POD_NAME = process.env.POD_NAME || 'unknown';  // injected by K8s downward API
 
 app.get('/', (req, res) => {
-  res.json({ status: 'ok', version: VERSION });
+  res.json({ status: 'ok', version: VERSION,message:"Hello from my CI/CD pipeline" });
 });
 
 app.get('/health', (req, res) => {
@@ -23,17 +23,21 @@ app.get('/info', (req, res) => {
   });
 });
 
-// Handle SIGTERM gracefully — critical for zero-downtime deploys
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received — shutting down gracefully');
-  server.close(() => {
-    console.log('Server closed');
-    process.exit(0);
+let server;
+
+if (require.main === module) {
+  server = app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT} in ${APP_ENV} mode`);
   });
-});
 
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT} in ${APP_ENV} mode`);
-});
+  // Handle SIGTERM gracefully — critical for zero-downside deploys
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received — shutting down gracefully');
+    server.close(() => {
+      console.log('Server closed');
+      process.exit(0);
+    });
+  });
+}
 
-module.exports = server;
+module.exports = { app, server };
