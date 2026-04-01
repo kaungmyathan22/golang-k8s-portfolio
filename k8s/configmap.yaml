@@ -3,5 +3,5 @@ kind: ConfigMap
 metadata:
   name: my-api-config
 data:
-  APP_ENV: "production"
-  APP_VERSION: "1.0.0"
+  APP_ENV: 'production'
+  APP_VERSION: '1.1.0'
