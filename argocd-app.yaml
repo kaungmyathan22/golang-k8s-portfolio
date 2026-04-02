@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-api
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/kaungmyathan22/golang-k8s-portfolio
+    targetRevision: HEAD
+    path: gitops/my-api          # ArgoCD watches this folder
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+
+  syncPolicy:
+    automated:
+      prune: true                # delete resources removed from Git
+      selfHeal: true             # auto-fix if someone manually changes cluster
+    syncOptions:
+    - CreateNamespace=true

@@ -18,6 +18,7 @@ spec:
     metadata:
       labels:
         app: my-api
+        environment: production
       annotations:
         prometheus.io/scrape: 'true'
         prometheus.io/port: '3000'
