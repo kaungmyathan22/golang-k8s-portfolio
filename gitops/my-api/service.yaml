@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-api-service
+  labels:
+    app: my-api
+spec:
+  selector:
+    app: my-api # ServiceMonitor uses this to find the service
+  ports:
+    - port: 80
+      name: http # named port — ServiceMonitor references this
+      targetPort: 3000
+  type: ClusterIP

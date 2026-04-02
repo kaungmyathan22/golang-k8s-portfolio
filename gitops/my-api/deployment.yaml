@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-api
+  labels:
+    app: my-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: my-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0 # never take a pod down before new one is ready
+      maxSurge: 1 # allow 1 extra pod during deployment
+  template:
+    metadata:
+      labels:
+        app: my-api
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '3000'
+        prometheus.io/path: '/metrics'
+    spec:
+      containers:
+        - name: my-api
+          image: my-api:local # GitHub Actions will update this
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3000
+
+          envFrom:
+            - configMapRef:
+                name: my-api-config
+
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name # K8s injects the actual pod name
+
+          resources:
+            requests:
+              memory: '64Mi'
+              cpu: '100m'
+            limits:
+              memory: '128Mi'
+              cpu: '200m'
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
