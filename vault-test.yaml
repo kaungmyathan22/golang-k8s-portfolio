@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: default
+  namespace: default
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vault-test
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vault-test
+  template:
+    metadata:
+      labels:
+        app: vault-test
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "my-api-role"
+        vault.hashicorp.com/agent-inject-secret-config: "secret/data/my-api"
+        vault.hashicorp.com/agent-inject-template-config: |
+          {{- with secret "secret/data/my-api" -}}
+          export DB_PASSWORD="{{ .Data.data.DB_PASSWORD }}"
+          export API_KEY="{{ .Data.data.API_KEY }}"
+          export DB_HOST="{{ .Data.data.DB_HOST }}"
+          {{- end }}
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: app
+        image: alpine:3.18
+        command: ["sh", "-c", "while true; do sleep 30; done"]
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "50m"
+          limits:
+            memory: "64Mi"
+            cpu: "100m"
