@@ -1,0 +1,14 @@
+replicaCount: 1
+
+resources:
+  requests:
+    memory: '32Mi'
+    cpu: '50m'
+  limits:
+    memory: '64Mi'
+    cpu: '100m'
+
+config:
+  appEnv: 'development'
+  appVersion: '1.0.0'
+  logLevel: 'debug'

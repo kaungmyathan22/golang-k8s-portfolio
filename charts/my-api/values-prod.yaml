@@ -1,0 +1,20 @@
+replicaCount: 3
+
+resources:
+  requests:
+    memory: '128Mi'
+    cpu: '200m'
+  limits:
+    memory: '256Mi'
+    cpu: '500m'
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 70
+
+config:
+  appEnv: 'production'
+  appVersion: '1.0.0'
+  logLevel: 'warn'

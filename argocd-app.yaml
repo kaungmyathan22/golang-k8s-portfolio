@@ -9,7 +9,12 @@ spec:
   source:
     repoURL: https://github.com/kaungmyathan22/golang-k8s-portfolio
     targetRevision: HEAD
-    path: gitops/my-api          # ArgoCD watches this folder
+    path: charts/my-api # point at the chart folder
+
+    helm:
+      valueFiles:
+        - values.yaml # base values
+        - values-prod.yaml # environment override
 
   destination:
     server: https://kubernetes.default.svc
@@ -17,7 +22,5 @@ spec:
 
   syncPolicy:
     automated:
-      prune: true                # delete resources removed from Git
-      selfHeal: true             # auto-fix if someone manually changes cluster
-    syncOptions:
-    - CreateNamespace=true
+      prune: true
+      selfHeal: true
