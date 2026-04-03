@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Release.Name }}-monitor
+  namespace: monitoring # must be in monitoring namespace
+  labels:
+    release: kube-prometheus-stack # this label tells the operator to pick it up
+spec:
+  namespaceSelector:
+    matchNames:
+      - default # watch services in the default namespace
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }} # find services with this label
+  endpoints:
+    - port: http # scrape the port named 'http' on the service
+      path: /metrics
+      interval: 15s
